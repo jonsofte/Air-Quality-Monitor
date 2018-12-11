@@ -1,0 +1,167 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta http-equiv="refresh" content="3600">
+
+
+    <title>Luftkvalitet i Torborg Nedreaas'gate</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/custom-style.css" />
+
+</head>
+
+<body>
+    <div class="container-fluid" style="background-color:#506380;padding-left:0px;padding-right:0px;">
+        <div class="container">
+            <div class="row" style="display: flex; flex-direction: row;">
+                <div class="col-lg-10 col-md-9 col-sm-9 col-xs-9">
+                    <center>
+                        <div style="color:#e6e9ed;" class="fontHeaderBigDisplay"><span><b>Luftforurensning i Bergen sentrum</b></span></div>
+                    </center>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3 fontHeaderDisplay" ; style="background-color: rgba(130, 130, 130, 0.25); text-align: center; vertical-align: middle;">
+                    <a href="arkitektur.html" style="color:orangered;"><b>Beskrivelse av arkitektur</b></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container" style="background-color:#e6e9ed;">
+        <div class="row" style="display: flex; flex-direction: row;">
+            <div class="col-lg-10 col-md-9 col-sm-9 col-xs-9">
+                <div id="panelLatestValuesDiv">
+                    <center><span class="fontHeaderDisplay">Siste registrerte måling: <span id="panelLastUpdatedTime"></span></span></center>
+                    <center><span class="fontHeaderBigDisplay" id="panelLastValuesInfo">Pm 2.5: <b><span id="panelPM025Value"></span>&nbsp;µg/m<sup>3</sup></b> Pm 10: <b><span id="panelPM100Value"></span>&nbsp;µg/m<sup>3</sup></b></span></center>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3" style="font-size:100%; background-color: rgba(130, 130, 130, 0.25); display: flex; flex-direction: column;">&nbsp;</div>
+        </div>
+    </div>
+    <div class="container" style="background-color:#9ba6b6;">
+        <div class="row">
+            <div class="col-lg-10 col-md-9 col-sm-9 col-xs-9"><div style="color:#e6e9ed; font-size:100%"><b>Verdier siste døgn:</b><br /></div></div>
+            <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3" style="color:#e6e9ed; font-size:100%; background-color: rgba(130, 130, 130, 0.25); display: flex; flex-direction: column;">&nbsp;</div>
+        </div>
+    </div>
+    <div class="container" style="background-color:#e6e9ed;">
+        <div class="row" style="display: flex; flex-direction: row;">
+            <div class="col-lg-10 col-md-9 col-sm-9 col-xs-9" id="d3graphDaily">
+                <svg id="graphDaily"></svg>
+            </div>
+            <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3" style="background-color: rgba(130, 130, 130, 0.25);">
+                <div id="panelLastDayStatDiv" class="hidden">
+                    <center>
+                        <br />
+                        <span class="fontDateDisplay">
+                            <b><span id="LastDayTimeValue"></span></b>
+                        </span>
+                        <br /><br />
+                        <span class="fontValuesDisplay">
+                            Pm 2.5: <b><span id="LastDayPM025Value"></span>&nbsp;µg/m<sup>3</sup></b><br />
+                            Pm 10: <b><span id="LastDayPM100Value"></span>&nbsp;µg/m<sup>3</sup></b><br />
+                        </span>
+                    </center>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container" style="background-color:#9ba6b6;">
+        <div class="row">
+            <div class="col-lg-10 col-md-9 col-sm-9 col-xs-9" style="color:#e6e9ed; font-size:100%"><b>Pm 10 - Verdier siste uke:</b><br /></div>
+            <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3" style="font-size:100%; background-color: rgba(130, 130, 130, 0.25); display: flex; flex-direction: column;">&nbsp;</div>
+        </div>
+    </div>
+    <div class="container" style="background-color:#e6e9ed;">
+        <div class="row" style="display: flex; flex-direction: row;">
+            <div class="col-lg-10 col-md-9 col-sm-9 col-xs-9" id="d3graphWeekly" style="background-color:#e6e9ed;"><svg id="graphWeekly"></svg></div>
+            <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3" style="font-size:100%; background-color: rgba(130, 130, 130, 0.25); display: flex; flex-direction: column;">
+                <div id="panelWeeklyStatDiv" class="hidden">
+                    <center>
+                        <br />
+                        <span class="fontDateDisplay">
+                            <b><span id="WeeklyTimeValue"></span></b>
+                        </span>
+                        <br /><br />
+                        <span class="fontValuesDisplay">
+                            Maks: <b><span id="WeeklyMaxValue"></span>&nbsp;µg/m<sup>3</sup></b><br />
+                            Min: <b><span id="WeeklyMinValue"></span>&nbsp;µg/m<sup>3</sup></b><br />
+                            Snitt: <b><span id="WeeklyAvgValue"></span>&nbsp;µg/m<sup>3</sup></b><br />
+                        </span>
+                    </center>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container" style="background-color:#9ba6b6;">
+        <div class="row">
+            <div class="col-lg-10 col-md-9 col-sm-9 col-xs-9" style="color:#e6e9ed; font-size:100%"><b>Pm 10 - Verdier siste 90 dager:</b></div>
+            <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3" style="color:#e6e9ed; font-size:100%; background-color: rgba(130, 130, 130, 0.25); display: flex; flex-direction: column;">&nbsp;</div>
+        </div>
+    </div>
+    <div class="container" style="background-color:#e6e9ed;">
+        <div class="row" style="display: flex; flex-direction: row;">
+            <div class="col-lg-10 col-md-9 col-sm-9 col-xs-9" div id="d3graph90days" style="background-color:#e6e9ed;"><svg id="graph90days"></svg></div>
+            <div class="col-lg-2 col-md-3 col-sm-3 col-xs-3" style="font-size:100%; background-color: rgba(130, 130, 130, 0.25);">
+                <div id="panel90DaysStatDiv" class="hidden">
+                    <center>
+                        <br />
+                        <span class="fontDateDisplay">
+                            <b><span id="NinetyDaysTimeValue"></span></b>
+                        </span>
+                        <br /><br />
+                        <span class="fontValuesDisplay">
+                            Maks: <b><span id="NinetyDaysMaxValue"></span>&nbsp;µg/m<sup>3</sup></b><br />
+                            Min: <b><span id="NinetyDaysMinValue"></span>&nbsp;µg/m<sup>3</sup></b><br />
+                            Snitt: <b><span id="NinetyDaysAvgValue"></span>&nbsp;µg/m<sup>3</sup></b><br />
+                        </span>
+                    </center>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12" style="background-color:#9ba6b6;"><center>Posisjon: Torgborg Nedreaasgate</center></div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12" id="map"></div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12" style="background-color:#e6e9ed;"><center><a href="arkitektur.html" style="font-size:130%">Beskrivelse av arktitektur</a></center></div>
+        </div>
+    </div>
+
+
+    <!-- SignalR-->
+    <script src="https://cdn.jsdelivr.net/npm/@aspnet/signalr@1.0.3/dist/browser/signalr.min.js"></script>
+    <script src="scripts/signalR.js"></script>
+    <!-- Graphs-->
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="http://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+    <script src="scripts/d3DailyGraph.js"></script>
+    <script src="scripts/d3WeeklyGraph.js"></script>
+    <script src="scripts/90daysGraph.js"></script>
+    <script src="scripts/resizeGraphs.js"></script>
+
+    <!-- Google maps -->
+    <script src="scripts/maps.js"></script>
+
+    <!-- Application Insights  -->
+    <script type="text/javascript">
+        var appInsights = window.appInsights || function (a) {
+            function b(a) { c[a] = function () { var b = arguments; c.queue.push(function () { c[a].apply(c, b) }) } } var c = { config: a }, d = document, e = window; setTimeout(function () { var b = d.createElement("script"); b.src = a.url || "https://az416426.vo.msecnd.net/scripts/a/ai.0.js", d.getElementsByTagName("script")[0].parentNode.appendChild(b) }); try { c.cookie = d.cookie } catch (a) { } c.queue = []; for (var f = ["Event", "Exception", "Metric", "PageView", "Trace", "Dependency"]; f.length;)b("track" + f.pop()); if (b("setAuthenticatedUserContext"), b("clearAuthenticatedUserContext"), b("startTrackEvent"), b("stopTrackEvent"), b("startTrackPage"), b("stopTrackPage"), b("flush"), !a.disableExceptionTracking) { f = "onerror", b("_" + f); var g = e[f]; e[f] = function (a, b, d, e, h) { var i = g && g(a, b, d, e, h); return !0 !== i && c["_" + f](a, b, d, e, h), i } } return c
+        }({
+            instrumentationKey: "09f22731-605c-4d92-96fb-2dd5646ae2cb"
+        });
+
+        window.appInsights = appInsights, appInsights.queue && 0 === appInsights.queue.length && appInsights.trackPageView();
+    </script>
+
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC4lnHooUCd9urE0Qg1HQ3nRtHXuQF4Lsw&callback=initMap" type="text/javascript"></script>
+</body>
+</html>

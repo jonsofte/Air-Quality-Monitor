@@ -1,0 +1,91 @@
+﻿body {
+    font-family: 'Montserrat', sans-serif;
+}
+
+.linePM100 {
+    fill: none;
+    stroke: #506380;
+    stroke-width: 1px;
+}
+
+.linePM025 {
+    fill: none;
+    stroke: darkred;
+    stroke-width: 1px;
+}
+
+.linePM010 {
+    fill: none;
+    stroke: darkorchid;
+    stroke-width: 1px;
+}
+
+.gridx line {
+    stroke: lightgrey;
+    stroke-opacity: 0.5;
+    shape-rendering: geometricPrecision;
+}
+
+.gridy line {
+    stroke: lightgrey;
+    stroke-opacity: 0.5;
+    shape-rendering: geometricPrecision;
+}
+
+.gridx path {
+    stroke-width: 0;
+}
+
+.gridy path {
+    stroke-width: 0;
+}
+
+.bar {
+    fill: gray;
+    opacity: 0.4
+}
+
+.bar.selected {
+    fill: orangered;
+    opacity: 0.7
+}
+
+#map {
+    height: 300px;
+}
+
+.fontValuesDisplay {
+    font-size: 130%;
+}
+
+.fontDateDisplay {
+    font-size: 90%;
+}
+
+.fontHeaderDisplay {
+    font-size: 100%;
+}
+
+.fontHeaderBigDisplay {
+    font-size: 180%;
+}
+
+
+@media screen and (max-width: 760px) {
+    .fontValuesDisplay {
+        font-size: 1.9vw;
+    }
+
+    .fontDateDisplay {
+        font-size: 1.5vw;
+    }
+
+    .fontHeaderDisplay {
+        font-size: 2.0vw;
+    }
+
+    .fontHeaderBigDisplay {
+        font-size: 3.2vw;
+    }
+
+}

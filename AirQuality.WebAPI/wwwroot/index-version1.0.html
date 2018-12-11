@@ -1,0 +1,460 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Luftkvalitet i Torborg Nedreaas'gate</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .linePM100 {
+            fill: none;
+            stroke: #506380;
+            stroke-width: 1px;
+        }
+
+        .linePM025 {
+            fill: none;
+            stroke: darkred;
+            stroke-width: 1px;
+        }
+
+        .linePM010 {
+            fill: none;
+            stroke: darkorchid;
+            stroke-width: 1px;
+        }
+
+        .gridx line {
+            stroke: lightgrey;
+            stroke-opacity: 0.5;
+            shape-rendering: geometricPrecision;
+        }
+
+        .gridy line {
+            stroke: lightgrey;
+            stroke-opacity: 0.5;
+            shape-rendering: geometricPrecision;
+        }
+
+        .my-fluid-container {
+            padding-left: 0px;
+            padding-right: 0px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .gridx path {
+            stroke-width: 0;
+        }
+
+        .gridy path {
+            stroke-width: 0;
+        }
+
+        .imageheader {
+            background: url("river-full.jpg") no-repeat;
+            background-size: cover;
+        }
+
+        #map {
+            height: 300px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="my-fluid-container">
+        <div class="col-lg-12" style="background-color:#506380;">
+            <center>
+                <div style="color:#e6e9ed; font-size:200%"><b>Luftforurensning i Torborg Nedreaas'gate</b><br /></div>
+            </center>
+        </div>
+        <div class="col-lg-12" style="background-color:#9ba6b6;">
+            <div class="col-lg-2"></div>
+            <div class="col-lg-8">
+                <center>
+                    <div class="panel-transparent">
+                        <div class="panel-body">
+                            <img src="loadspinner.svg" id="spinner">
+                            <!-- PM1.0: <b><span id="panelPM010Value"></span>&nbsp;µg/m<sup>3</sup></b>   -->
+                            <div style="font-size:120%; display:none;" id="panelInfo">
+                                PM2.5: <b><span id="panelPM025Value"></span>&nbsp;µg/m<sup>3</sup></b> PM10: <b><span id="panelPM100Value"></span>&nbsp;µg/m<sup>3</sup></b>
+                                <span id="panelFlowChangeLabel" class="label label-info hidden"><span id="panelFlowChangeGlyph" class="glyphicon glyphicon-record" aria-hidden="true"></span> Endring: <span id="panelChangeValue"></span></span><br />
+                            </div>
+                        </div>
+                    </div>
+                </center>
+            </div>
+            <div class="col-lg-2"></div>
+        </div>
+        <div class="col-lg-12" style="background-color:#e6e9ed;">
+            <center>
+                <div id="d3graph"><svg id="graph"></svg></div>
+            </center>
+        </div>
+        <div class="col-lg-12" style="background-color:#9ba6b6; height:40px;"><center>Siste oppdatering: <b><span id="panelUpdateTimeDiv"></span></b><br /></center></div>
+        <div class="col-lg-12" id="map"></div>
+        <div class="col-lg-12" style="background-color:#e6e9ed;"><center>Posisjon: 60.387706 5.315507 <br /><a href="arkitektur.html" style="font-size:130%">Beskrivelse av arktitektur</a></center></div>
+    </div>
+
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="http://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="scripts/signalr-client-1.0.0-alpha2-final.js"></script>
+    <script src="scripts/maps.js"></script>
+
+    <script type="text/javascript">
+        var appInsights = window.appInsights || function (a) {
+            function b(a) { c[a] = function () { var b = arguments; c.queue.push(function () { c[a].apply(c, b) }) } } var c = { config: a }, d = document, e = window; setTimeout(function () { var b = d.createElement("script"); b.src = a.url || "https://az416426.vo.msecnd.net/scripts/a/ai.0.js", d.getElementsByTagName("script")[0].parentNode.appendChild(b) }); try { c.cookie = d.cookie } catch (a) { } c.queue = []; for (var f = ["Event", "Exception", "Metric", "PageView", "Trace", "Dependency"]; f.length;)b("track" + f.pop()); if (b("setAuthenticatedUserContext"), b("clearAuthenticatedUserContext"), b("startTrackEvent"), b("stopTrackEvent"), b("startTrackPage"), b("stopTrackPage"), b("flush"), !a.disableExceptionTracking) { f = "onerror", b("_" + f); var g = e[f]; e[f] = function (a, b, d, e, h) { var i = g && g(a, b, d, e, h); return !0 !== i && c["_" + f](a, b, d, e, h), i } } return c
+        }({
+            instrumentationKey: "09f22731-605c-4d92-96fb-2dd5646ae2cb"
+        });
+
+        window.appInsights = appInsights, appInsights.queue && 0 === appInsights.queue.length && appInsights.trackPageView();
+    </script>
+
+    <script>
+
+        // Oppsett
+        var inputData;
+        var latestDataValue;
+
+        var margin = { top: 30, right: 40, bottom: 30, left: 40 },
+            width = parseInt(d3.select('.my-fluid-container').style('width')),
+            width = width - 40 - margin.left - margin.right
+
+        height = 500 - margin.top - margin.bottom;
+
+        var parseTime = d3.timeParse("%Y-%m-%dT%H:%M:%S.%LZ");
+        var formatTime = d3.timeFormat("%Y-%m-%d %H:%M:%S");
+
+        // Definere skala
+        var x = d3.scaleTime().range([0, width]);
+        var y = d3.scaleLinear().range([height, 0]);
+
+        // Definere PM10 linje
+        var valuelinePM100 = d3.line()
+            //.curve(d3.curveCardinal)
+            .x(function (d) { return x(d.readDateTime); })
+            .y(function (d) { return y(d.pM100); });
+
+        // Definere PM2.5 linje
+        var valuelinePM025 = d3.line()
+            //.curve(d3.curveCardinal)
+            .x(function (d) { return x(d.readDateTime); })
+            .y(function (d) { return y(d.pM025); });
+
+        /*
+                // Definere PM1.0 linje
+                var valuelinePM010 = d3.line()
+                    .x(function(d) { return x(d.readDateTime); })
+                    .y(function(d) { return y(d.pM010); });
+        */
+        var svg = d3.select("#graph")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        // Funksjon for X-akse
+        function make_x_gridlines() {
+            return d3.axisBottom(x)
+                .ticks(24);
+        }
+
+        // Funksjon for Y-akse
+        function make_y_gridlines() {
+            return d3.axisLeft(y).ticks(10)
+        }
+
+        // Hent og parse data
+        d3.json("/api/airquality", function (error, data) {
+            if (error) throw error;
+
+            inputData = data;
+
+            inputData.forEach(function (d) {
+                d.readDateTime = parseTime(d.readDateTime);
+                d.pM010 = +d.pM010;
+                d.pM025 = +d.pM025;
+                d.pM100 = +d.pM100;
+            });
+
+            latestDataValue = inputData[inputData.length - 1]
+
+            // Domene-verdier for mapping av input
+            x.domain(d3.extent(inputData, function (d) { return d.readDateTime; }));
+            y.domain([0, d3.max(inputData, function (d) { return d.pM100; }) + 10]);
+
+            //Fargebånd i bakgrunn
+
+            var yellowPos = y(60) < 0 ? 0 : y(60);
+            var yellowHeight = y(30) - (y(60) < 0 ? 0 : y(60));
+            var greenHeight = y(30) < 0 ? 0 : y(30);
+
+
+            svg.append("svg:rect")
+                .attr("class", "bands")
+                .style("fill", "red")
+                .style("opacity", "0.04")
+                .attr('width', width)
+                .attr('height', yellowPos);
+
+            svg.append("svg:rect")
+                .attr("class", "bands")
+                .style("fill", "yellow")
+                .style("opacity", "0.04")
+                .attr('width', width)
+                .attr('height', yellowHeight)
+                .attr("transform", "translate(0," + yellowPos + ")");
+
+            svg.append("svg:rect")
+                .attr("class", "bands")
+                .style("fill", "green")
+                .style("opacity", "0.04")
+                .attr('width', width)
+                .attr('height', height - greenHeight)
+                .attr("transform", "translate(0," + greenHeight + ")");
+
+            // X grid
+            svg.append("g")
+                .attr("class", "gridx")
+                .attr("transform", "translate(0," + height + ")")
+                .call(make_x_gridlines()
+                    .tickSize(-height)
+                    .tickFormat("")
+                )
+
+            // Y grid
+            svg.append("g")
+                .attr("class", "gridy")
+                .call(make_y_gridlines()
+                    .tickSize(-width)
+                    .tickFormat("")
+                )
+
+            // Linje for PM10-verdier
+            svg.append("path")
+                .data([inputData])
+                .attr("class", "linePM100")
+                .attr("d", valuelinePM100);
+
+            // Linje for PM2.5-verdier
+            svg.append("path")
+                .data([inputData])
+                .attr("class", "linePM025")
+                .attr("d", valuelinePM025);
+
+            // Linje for PM1-verdier
+            /*           svg.append("path")
+                           .data([inputData])
+                           .attr("class", "linePM010")
+                           .attr("d", valuelinePM010);
+           */
+            // Legg til X-akse
+            svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x).tickFormat(d3.timeFormat("%H:%M")))
+                .style("font-family", "Montserrat");
+
+            // Legg til Y-akse
+            svg.append("g")
+                .attr("class", "y axis")
+                .call(d3.axisLeft(y))
+                .style("font-family", "Montserrat");
+
+            var mouseG = svg.append("g")
+                .attr("class", "mouse-over-effects");
+
+            //  Vertikal linje for peker
+            mouseG.append("path")
+                .attr("class", "mouse-line")
+                .style("stroke", "black")
+                .style("stroke-width", "1px")
+                .style("opacity", "0.5");
+
+            mouseG.append('svg:rect') // For håndtering av peker
+                .attr('width', width)
+                .attr('height', height)
+                .attr('fill', 'none')
+                .attr('pointer-events', 'all')
+                .on('mouseout', function () {    // Skjul linje
+                    d3.select(".mouse-line")
+                        .style("opacity", "0");
+                    d3.select("#panelPM025Value").text(latestDataValue.pM025);
+                    d3.select("#panelPM100Value").text(latestDataValue.pM100);
+
+                })
+                .on('mouseover', function () { // Vis linje
+                    d3.select(".mouse-line")
+                        .style("opacity", "0.5");
+                })
+                .on('mousemove', function () { // Flytt linje
+                    var mouse = d3.mouse(this);
+
+                    d3.select(".mouse-line")
+                        .attr("d", function () {
+                            var d = "M" + mouse[0] + "," + height;
+                            d += " " + mouse[0] + "," + 0;
+                            return d;
+                        });
+
+                    var beginning = 0,
+
+                        // Finn verdi for PM10
+                        line = d3.select(".linePM100");
+                    end = line.node().getTotalLength(),
+                        target = null;
+                    while (true) {
+                        target = Math.floor((beginning + end) / 2);
+                        pos = line.node().getPointAtLength(target);
+                        if ((target === end || target === beginning) && pos.x !== mouse[0]) {
+                            break;
+                        }
+                        if (pos.x > mouse[0]) end = target;
+                        else if (pos.x < mouse[0]) beginning = target;
+                        else break;
+                    }
+                    var pm100value = y.invert(pos.y);
+                    var beginning = 0,
+                        line = d3.select(".linePM025");
+                    end = line.node().getTotalLength(),
+                        target = null;
+                    while (true) {
+                        target = Math.floor((beginning + end) / 2);
+                        pos = line.node().getPointAtLength(target);
+                        if ((target === end || target === beginning) && pos.x !== mouse[0]) {
+                            break;
+                        }
+                        if (pos.x > mouse[0]) end = target;
+                        else if (pos.x < mouse[0]) beginning = target;
+                        else break;
+                    }
+                    var pm025value = y.invert(pos.y);
+
+                    //console.log("PM100: " + pm100value.toFixed(2) + " PM025: " + pm025value.toFixed(2));
+                    d3.select("#panelPM025Value").text(pm025value.toFixed(0));
+                    d3.select("#panelPM100Value").text(pm100value.toFixed(0));
+
+                });
+
+            d3.select("#panelUpdateTimeDiv").text(formatTime(latestDataValue.readDateTime));
+            d3.select("#panelPM010Value").text(latestDataValue.pM010);
+            d3.select("#panelPM025Value").text(latestDataValue.pM025);
+            d3.select("#panelPM100Value").text(latestDataValue.pM100);
+
+
+            //Kode for visning av trend med piler
+            //***********************************
+            /*
+                        d3.select("#panelFlowChangeValue").text("  " + latestDataValue.changeSincePreviousPoint);
+                        if (latestDataValue.changeSincePreviousPoint > 0) {
+                            d3.select("#panelFlowChangeLabel").attr("class","label label-danger");
+                            d3.select("#panelFlowChangeGlyph").attr("class","glyphicon glyphicon-arrow-up");
+                        }
+                        else if (latestDataValue.changeSincePreviousPoint < 0) {
+                            d3.select("#panelFlowChangeLabel").attr("class","label label-success");
+                            d3.select("#panelFlowChangeGlyph").attr("class","glyphicon glyphicon-arrow-down");
+                        }
+                        else {
+                            d3.select("#panelFlowChangeLabel").attr("class","label label-info");
+                            d3.select("#panelFlowChangeGlyph").attr("class","glyphicon glyphicon-record");
+                        }
+            */
+
+            d3.select("#spinner").attr("style", "display:none");
+            d3.select("#panelInfo").attr("style", "font-size:200%;");
+        });
+
+
+        // SignalR Hub
+
+        let hubConnection = new signalR.HubConnection('/hubmessage', { transport: signalR.TransportType.LongPolling });
+
+        hubConnection.on('send', data => {
+            var newPoint = JSON.parse(data)
+            var insertPoint = {
+                readDateTime: parseTime(newPoint.ReadDateTime),
+                pM010: +newPoint.PM010,
+                pM025: +newPoint.PM025,
+                pM100: +newPoint.PM100
+            }
+            inputData.push(insertPoint);
+            inputData.shift();
+            latestDataValue = inputData[inputData.length - 1];
+
+            d3.select("#panelUpdateTimeDiv").text(formatTime(latestDataValue.readDateTime));
+            d3.select("#panelPM010Value").text(latestDataValue.pM010);
+            d3.select("#panelPM025Value").text(latestDataValue.pM025);
+            d3.select("#panelPM100Value").text(latestDataValue.pM100);
+
+            resize();
+
+            console.log(data);
+        });
+
+        hubConnection.start();
+
+        // D3
+
+        //Skaler graf ved resize av skjerm
+        d3.select(window).on('resize', resize);
+
+        function resize() {
+
+            width = parseInt(d3.select('.my-fluid-container').style('width'));
+            width = width - 30 - margin.left - margin.right;
+
+            x = d3.scaleTime().range([0, width]);
+            y = d3.scaleLinear().range([height, 0]);
+
+            x.domain(d3.extent(inputData, function (d) { return d.readDateTime; }));
+            y.domain([0, d3.max(inputData, function (d) { return d.pM100; }) + 10]);
+
+            d3.select("#graph").attr("width", width + margin.left + margin.right);
+
+            svg.select('.x.axis')
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x).tickFormat(d3.timeFormat("%H:%M")));
+
+            svg.select('.y.axis')
+                .call(d3.axisLeft(y));
+
+            svg.select('.gridy')
+                .call(make_y_gridlines()
+                    .tickSize(-width)
+                    .tickFormat(""));
+
+            svg.select('.gridx')
+                .attr("transform", "translate(0," + height + ")")
+                .call(make_x_gridlines()
+                    .tickSize(-height)
+                    .tickFormat(""));
+
+            svg.select('.linePM100')
+                .attr("d", valuelinePM100);
+
+            svg.select('.linePM025')
+                .attr("d", valuelinePM025);
+
+            svg.selectAll('.bands')
+                .attr('width', width);
+
+            svg.select('.mouse-over-effects > rect')
+                .attr('width', width)
+                .attr('height', height);
+
+        };
+
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC4lnHooUCd9urE0Qg1HQ3nRtHXuQF4Lsw&callback=initMap" type="text/javascript"></script>
+</body>
+</html>

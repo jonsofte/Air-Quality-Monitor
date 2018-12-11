@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Beskrivelse av arkitektur</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <meta charset="utf-8" />
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        a:link {
+            color: darkred;
+        }
+
+        a:visited {
+            color: darkred;
+        }
+    </style>
+    <title></title>
+</head>
+<body bgcolor="#e6e9ed" li>
+    <script type="text/javascript">
+        var appInsights = window.appInsights || function (a) {
+            function b(a) { c[a] = function () { var b = arguments; c.queue.push(function () { c[a].apply(c, b) }) } } var c = { config: a }, d = document, e = window; setTimeout(function () { var b = d.createElement("script"); b.src = a.url || "https://az416426.vo.msecnd.net/scripts/a/ai.0.js", d.getElementsByTagName("script")[0].parentNode.appendChild(b) }); try { c.cookie = d.cookie } catch (a) { } c.queue = []; for (var f = ["Event", "Exception", "Metric", "PageView", "Trace", "Dependency"]; f.length;)b("track" + f.pop()); if (b("setAuthenticatedUserContext"), b("clearAuthenticatedUserContext"), b("startTrackEvent"), b("stopTrackEvent"), b("startTrackPage"), b("stopTrackPage"), b("flush"), !a.disableExceptionTracking) { f = "onerror", b("_" + f); var g = e[f]; e[f] = function (a, b, d, e, h) { var i = g && g(a, b, d, e, h); return !0 !== i && c["_" + f](a, b, d, e, h), i } } return c
+        }({
+            instrumentationKey: "09f22731-605c-4d92-96fb-2dd5646ae2cb"
+        });
+
+        window.appInsights = appInsights, appInsights.queue && 0 === appInsights.queue.length && appInsights.trackPageView();
+    </script>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-1"></div>
+            <div class="col-lg-10" style="font-size:120%">
+                <br />
+                <img src="img/ESP32-Azure.png" class="img-responsive" />
+                <h3>Beskrivelse:</h3><br />
+                <b>1:</b> Systemet er bygget med en <a href="http://esp32.net/">ESP32</a>-mikrokontroller med <a href="http://mongoose-os.com">Mongoose OS</a><br />
+                <b>2:</b> I et fast tidsintervall blir verdier hentet fra en <a href="http://www.aqmd.gov/docs/default-source/aq-spec/resources-page/plantower-pms5003-manual_v2-3.pdf">PMS5003</a> Svevestøv-sensor<br />
+                <b>3:</b> Via Wi-Fi blir data overført med <a href="http://mqtt.org/">MQTT</a>-protokollen til <a href="https://azure.microsoft.com/en-us/services/iot-hub/">Azure IoT Hub</a><br />
+                <b>4:</b> IoT Hub videreformidler data til <a href="https://azure.microsoft.com/nb-no/services/event-hubs/">Azure Event Hub</a><br />
+                <b>5:</b> En funksjon i <a href="http://azure.microsoft.com/en-us/services/functions/">Azure Functions</a> trigges av eventen. Denne lagrer avleste verdier i en tabell i <a href="https://azure.microsoft.com/en-us/services/storage/tables/">Azure Table Storage</a> og samtidig oppdaterers websiden med siste verdi via <a href="https://www.asp.net/signalr">Signal R</a><br />
+                <b>6:</b> Periodevis starter en cron-timer en funksjon i Azure Functions som genererer statistikk basert på avleste verdier<br />
+                <b>7:</b> <a href="http://www.microsoft.com/net/core">.Net Core</a> ASP.NET Web API tilgjengeligjør data fra Table Storage i et Web REST API<br />
+                <b>8:</b> Websiden kjøres i <a href="https://azure.microsoft.com/nb-no/services/app-service/web/">Azure Web Apps</a> og visualiserer data med <a href="https://d3js.org/">D3 Javascript</a>-bibliotek<br /><br />
+            </div>
+            <div class="col-lg-1"></div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-lg-1"></div>
+            <div class="col-lg-5">
+                <img src="img/sensor2.jpeg" class="img-responsive" width="500" />
+                ESP32 mikrokontroller og PMS5003 svevestøv-sensor<br /><br />
+            </div>
+            <div class="col-lg-5">
+                <img src="img/sensor1.jpeg" class="img-responsive" width="500" />
+                Innbygd ESP32 og svevestøv-sensor med værbeskytter<br /><br />
+            </div>
+            <div class="col-lg-1"></div>
+        </div>
+    </div>
+</body>
+</html>
