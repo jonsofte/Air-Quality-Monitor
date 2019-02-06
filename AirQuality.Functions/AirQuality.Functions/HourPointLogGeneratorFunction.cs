@@ -1,8 +1,10 @@
 using System;
 using System.Globalization;
 using System.Linq;
+using AirQuality.TableStorageEntities;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Logging;
 
 namespace AzureFunctionEventToTable
 {
@@ -19,10 +21,10 @@ namespace AzureFunctionEventToTable
             [Table("pms5003Data", Connection = "AzureWebJobsStorage")] IQueryable<PointMeasurementEntity> LogPointEntries, 
             [Table("HourLogMeasurement", Connection = "AzureWebJobsStorage")] IQueryable<HourLogMeasurementEntity> HourLogLookupEntries,
             [Table("HourLogMeasurement", Connection = "AzureWebJobsStorage")] ICollector<HourLogMeasurementEntity> HourLogInsertEntries,
-            TraceWriter log)
+            ILogger logger)
         {
-            log.Info($"Timer trigger function executed at UTC: {DateTime.Now}");
-            GenerateHourlyStatValues(GetLastInsertedHourValue(HourLogLookupEntries), LogPointEntries, HourLogInsertEntries, log);
+            logger.LogInformation($"Timer trigger function executed at UTC: {DateTime.Now}");
+            GenerateHourlyStatValues(GetLastInsertedHourValue(HourLogLookupEntries), LogPointEntries, HourLogInsertEntries, logger);
         }
 
         private static DateTime GetLastInsertedHourValue(IQueryable<HourLogMeasurementEntity> HourLogLookupEntries)
@@ -37,19 +39,19 @@ namespace AzureFunctionEventToTable
             return DateTime.Parse(lastHourPointQuery.ToList().OrderByDescending(x => x.ReadDateTime).Take(1).Single().RowKey);
         }
 
-        private static void GenerateHourlyStatValues(DateTime generateFromDateTime, IQueryable<PointMeasurementEntity> LogPointEntries, ICollector<HourLogMeasurementEntity> HourLogInsertEntries, TraceWriter log)
+        private static void GenerateHourlyStatValues(DateTime generateFromDateTime, IQueryable<PointMeasurementEntity> LogPointEntries, ICollector<HourLogMeasurementEntity> HourLogInsertEntries, ILogger logger)
         {
             CultureInfo norwegianCultureInfo = new CultureInfo("nn-No");
             TimeZoneInfo norwegianTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("W. Europe Standard Time");
 
-            log.Info($"Retrieved last inserted HourLog Value: {generateFromDateTime}");
+            logger.LogInformation($"Retrieved last inserted HourLog Value: {generateFromDateTime}");
 
             var logPointQuery = from point in LogPointEntries
                         where point.PartitionKey.Equals("Torborg")
                         && point.RowKey.CompareTo(generateFromDateTime.AddHours(1).ToString("o")) > 0
                         select point;
 
-            log.Info($"Retrived {logPointQuery.ToList().Count()} logpoints from database");
+            logger.LogInformation($"Retrived {logPointQuery.ToList().Count()} logpoints from database");
 
             // Generate hourly summary values
 
@@ -93,7 +95,7 @@ namespace AzureFunctionEventToTable
                 };
 
                 HourLogInsertEntries.Add(hourLogPoint);
-                log.Info($"Inserted Entry: Hour: {hour.Day} Max25: {hour.MaxPM025} Avg25: {hour.AvgPM025.ToString("F")} Min25: {hour.MinPM025} Antall: {hour.Count}");
+                logger.LogInformation($"Inserted Entry: Hour: {hour.Day} Max25: {hour.MaxPM025} Avg25: {hour.AvgPM025.ToString("F")} Min25: {hour.MinPM025} Antall: {hour.Count}");
             }
         }
     }

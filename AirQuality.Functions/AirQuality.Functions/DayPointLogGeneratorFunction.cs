@@ -1,8 +1,10 @@
 using System;
 using System.Globalization;
 using System.Linq;
+using AirQuality.TableStorageEntities;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Logging;
 
 namespace AzureFunctionEventToTable
 {
@@ -18,10 +20,10 @@ namespace AzureFunctionEventToTable
             [Table("pms5003Data", Connection = "AzureWebJobsStorage")] IQueryable<PointMeasurementEntity> LogPointEntries,
             [Table("DayLogMeasurement", Connection = "AzureWebJobsStorage")] IQueryable<DayLogMeasurementEntity> HourLogLookupEntries,
             [Table("DayLogMeasurement", Connection = "AzureWebJobsStorage")] ICollector<DayLogMeasurementEntity> HourLogInsertEntries,
-            TraceWriter log)
+            ILogger logger)
         {
-            log.Info($"Timer trigger function executed at UTC: {DateTime.Now}");
-            GenerateDailyStatValues(GetLastInsertedDayValue(HourLogLookupEntries), LogPointEntries, HourLogInsertEntries, log);
+            logger.LogInformation($"Timer trigger function executed at UTC: {DateTime.Now}");
+            GenerateDailyStatValues(GetLastInsertedDayValue(HourLogLookupEntries), LogPointEntries, HourLogInsertEntries, logger);
         }
 
         // Get time from last inserted value
@@ -39,19 +41,19 @@ namespace AzureFunctionEventToTable
         }
 
         // Generate values and insert to Table Storage
-        private static void GenerateDailyStatValues(DateTime generateFromDateTime, IQueryable<PointMeasurementEntity> LogPointEntries, ICollector<DayLogMeasurementEntity> DayLogInsertEntries, TraceWriter log)
+        private static void GenerateDailyStatValues(DateTime generateFromDateTime, IQueryable<PointMeasurementEntity> LogPointEntries, ICollector<DayLogMeasurementEntity> DayLogInsertEntries, ILogger logger)
         {
             CultureInfo norwegianCultureInfo = new CultureInfo("nn-No");
             TimeZoneInfo norwegianTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("W. Europe Standard Time");
 
-            log.Info($"Retrieved last inserted DayLog Value: {generateFromDateTime}");
+            logger.LogInformation($"Retrieved last inserted DayLog Value: {generateFromDateTime}");
 
             var logPointQuery = from point in LogPointEntries
                                 where point.PartitionKey.Equals("Torborg")
                                 && point.RowKey.CompareTo(generateFromDateTime.AddDays(1).ToString("o")) > 0
                                 select point;
 
-            log.Info($"Retrived {logPointQuery.ToList().Count()} logpoints from database");
+            logger.LogInformation($"Retrived {logPointQuery.ToList().Count()} logpoints from database");
 
             var dailyStat = from p in logPointQuery.ToList()
                             group p by new { p.ReadDateTime.Year, p.ReadDateTime.Month, p.ReadDateTime.Day } into grouping
@@ -93,8 +95,8 @@ namespace AzureFunctionEventToTable
                     NumberOfPoints = day.Count
                 };
 
-                DayLogInsertEntries.Add(dayLogPoint);                
-                log.Info($"Inserted Entry: Day: {day.Day.Date.ToShortDateString()} Max25: {day.MaxPM025} Avg25: {day.AvgPM025.ToString("F")} Min25: {day.MinPM025} Antall: {day.Count}");
+                DayLogInsertEntries.Add(dayLogPoint);
+                logger.LogInformation($"Inserted Entry: Day: {day.Day.Date.ToShortDateString()} Max25: {day.MaxPM025} Avg25: {day.AvgPM025.ToString("F")} Min25: {day.MinPM025} Antall: {day.Count}");
             }
         }
     }
