@@ -1,6 +1,8 @@
 ﻿
 # Air Quality Monitor
 
+## After 2 years, the hardware finally gave up on Bergens wet and humid weather. The system is now offline.
+
 Enkelt IOT-prosjekt som måler svevestøv og som presenter måling på web-side.
 
 * [http://bergenluftinfo.azurewebsites.net/](http://bergenluftinfo.azurewebsites.net/) - URL til Webside
